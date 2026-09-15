@@ -1,0 +1,9 @@
+# Local runtime database
+htdocs/mediverse.sqlite
+htdocs/mediverse.sqlite-journal
+
+# Temporary / OS files
+Thumbs.db
+desktop.ini
+.DS_Store
+*.log
