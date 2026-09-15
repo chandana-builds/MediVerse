@@ -126,6 +126,7 @@ h1{
         <!-- 🔴 FORCE CORRECT FLOW -->
         <a href="login.php" class="btn login-btn">Login</a>
         <a href="register.php" class="btn register-btn">Get Started</a>
+        <a href="database.php" class="btn" style="background:#0284c7;">🗄️ View Database</a>
     </div>
 
     <div class="features">

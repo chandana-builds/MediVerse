@@ -11,17 +11,17 @@ if (isset($_SESSION['user_id'])) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // Get form data
-    $username = trim($_POST['username']);
+    // Get form data (username or email/gmail)
+    $login_input = trim($_POST['username']);
     $password = $_POST['password'];
 
-    if (empty($username) || empty($password)) {
+    if (empty($login_input) || empty($password)) {
         echo "<script>alert('All fields are required');</script>";
     } else {
 
-        // Prepare secure query
-        $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username=?");
-        $stmt->bind_param("s", $username);
+        // Prepare secure query supporting Username or Email (Gmail)
+        $stmt = $conn->prepare("SELECT id, username, email, password FROM users WHERE username=? OR email=?");
+        $stmt->bind_param("ss", $login_input, $login_input);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -35,6 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Create session
                 $_SESSION['user_id'] = $row['id'];
                 $_SESSION['username'] = $row['username'];
+                $_SESSION['email'] = $row['email'];
 
                 // ✅ Redirect to dashboard
                 header("Location: dashboard.php");
@@ -45,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
         } else {
-            echo "<script>alert('❌ User not found');</script>";
+            echo "<script>alert('❌ User not found with that Username or Email');</script>";
         }
 
         $stmt->close();
@@ -169,8 +170,8 @@ body{
 <form method="POST">
 
     <div class="group">
-        <label class="label">Username</label>
-        <input type="text" name="username" class="input" required>
+        <label class="label">Username or Email (Gmail)</label>
+        <input type="text" name="username" class="input" placeholder="Enter username or email" required>
     </div>
 
     <div class="group">

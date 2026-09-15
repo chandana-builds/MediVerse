@@ -18,14 +18,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     else {
 
-        // Check if user already exists
-        $check = $conn->prepare("SELECT id FROM users WHERE username=?");
-        $check->bind_param("s", $username);
+        // Check if username or email already exists
+        $check = $conn->prepare("SELECT id FROM users WHERE username=? OR email=?");
+        $check->bind_param("ss", $username, $email);
         $check->execute();
         $check->store_result();
 
         if ($check->num_rows > 0) {
-            echo "<script>alert('Username already exists');</script>";
+            echo "<script>alert('Username or Email already registered');</script>";
         } else {
 
             // Hash password securely
@@ -173,8 +173,8 @@ body{
     </div>
 
     <div class="group">
-        <label class="label">Email</label>
-        <input type="email" name="email" class="input" required>
+        <label class="label">Email (Gmail)</label>
+        <input type="email" name="email" class="input" placeholder="e.g. yourname@gmail.com" required>
     </div>
 
     <div class="group">

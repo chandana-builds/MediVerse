@@ -181,8 +181,9 @@ function triggerEmergency() {
 <a href="symptom.php" class="card">🧠 <h3>Symptom Checker</h3></a>
 <a href="insurance.php" class="card">💳 <h3>Insurance</h3></a>
 
-<!-- ✅ NEW FEATURE -->
+<!-- ✅ FEATURES -->
 <a href="family.php" class="card">👨‍👩‍👧 <h3>Family Members</h3></a>
+<a href="database.php" class="card" style="border: 1px solid #00c6ff;">🗄️ <h3>Database Viewer</h3></a>
 
 </div>
 
