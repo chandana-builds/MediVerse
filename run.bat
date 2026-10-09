@@ -15,5 +15,5 @@ echo Starting PHP Server on http://localhost:8000 ...
 echo Press Ctrl+C anytime to stop the server.
 echo.
 start http://localhost:8000
-%PHP_CMD% -S localhost:8000 -t "%~dp0htdocs"
+%PHP_CMD% -S localhost:8000 -c "%~dp0php.ini" -t "%~dp0htdocs"
 pause

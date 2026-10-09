@@ -39,8 +39,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     }
 }
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -161,13 +159,15 @@ function updateDoctors(){
 }
 
 // Slot selection
-function selectSlot(time){
+function selectSlot(event, time){
     document.getElementById("selected_time").value = time;
 
     let slots = document.querySelectorAll(".slot");
     slots.forEach(s => s.style.background = "#1161ee");
 
-    event.target.style.background = "green";
+    if (event && event.currentTarget) {
+        event.currentTarget.style.background = "green";
+    }
 }
 </script>
 
@@ -223,11 +223,11 @@ function selectSlot(time){
         <label>Available Slots</label>
 
         <div class="slots">
-            <div class="slot" onclick="selectSlot('09:00 AM')">09:00 AM</div>
-            <div class="slot" onclick="selectSlot('10:30 AM')">10:30 AM</div>
-            <div class="slot" onclick="selectSlot('02:00 PM')">02:00 PM</div>
-            <div class="slot" onclick="selectSlot('04:30 PM')">04:30 PM</div>
-            <div class="slot" onclick="selectSlot('06:00 PM')">06:00 PM</div>
+            <div class="slot" onclick="selectSlot(event, '09:00 AM')">09:00 AM</div>
+            <div class="slot" onclick="selectSlot(event, '10:30 AM')">10:30 AM</div>
+            <div class="slot" onclick="selectSlot(event, '02:00 PM')">02:00 PM</div>
+            <div class="slot" onclick="selectSlot(event, '04:30 PM')">04:30 PM</div>
+            <div class="slot" onclick="selectSlot(event, '06:00 PM')">06:00 PM</div>
         </div>
 
         <input type="hidden" name="time" id="selected_time" required>

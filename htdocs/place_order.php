@@ -16,22 +16,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $store_name = $_POST['store_name'];
     $payment_method = $_POST['payment_method'];
 
-    // ✅ IMPORTANT FIX (added)
-    $prescription_required = $_POST['prescription_required'];
+    // ✅ Prescription flag validation
+    $prescription_required = isset($_POST['prescription_required']) ? intval($_POST['prescription_required']) : 0;
 
-    // (Optional for future use)
-    $prescription_file = NULL;
+    // Insert into DB using prepared statement
+    $stmt = $conn->prepare("
+        INSERT INTO medicine_orders 
+        (user_id, medicine_name, quantity, store_name, payment_method, prescription_required, prescription_file, order_status)
+        VALUES (?, ?, ?, ?, ?, ?, NULL, 'Pending')
+    ");
 
-    // Insert into DB
-    $sql = "INSERT INTO medicine_orders 
-            (user_id, medicine_name, quantity, store_name, payment_method, prescription_required, prescription_file)
-            VALUES 
-            ('$user_id', '$medicine_name', '$quantity', '$store_name', '$payment_method', '$prescription_required', '$prescription_file')";
+    $stmt->bind_param("isissi", $user_id, $medicine_name, $quantity, $store_name, $payment_method, $prescription_required);
 
-    if ($conn->query($sql) === TRUE) {
+    if ($stmt->execute()) {
         echo "<script>alert('✅ Order Placed Successfully'); window.location='dashboard.php';</script>";
+        exit();
     } else {
-        echo "❌ Error: " . $conn->error;
+        echo "❌ Error: " . $stmt->error;
     }
 }
 ?>
