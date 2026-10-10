@@ -41,12 +41,21 @@ Then navigate to [http://localhost:8000](http://localhost:8000).
 
 ---
 
-## 🗄️ Database Configuration
+## 🌐 Deploy to Render (Free 1-Click Cloud Deployment)
 
-MediVerse comes equipped with a **universal database connector** ([`htdocs/db.php`](htdocs/db.php)):
-1. **Zero-Configuration Mode (Default)**: Automatically uses a local SQLite database with all tables pre-initialized and seeded with default medicines and a demo account (`demo` / `password123`).
-2. **MySQL / MariaDB Mode**: Set environment variables (`DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`, `DB_PORT`) to connect directly to any local or remote MySQL server.
-3. **Database Schema**: Full DDL schema and sample data are provided in [`schema.sql`](schema.sql) for import into phpMyAdmin, cPanel, or XAMPP.
+MediVerse includes a production-ready [`Dockerfile`](Dockerfile) and [`render.yaml`](render.yaml) configured specifically for Render's free tier.
+
+### Quick Deploy via Render:
+1. Go to [render.com](https://render.com) and sign in with your GitHub account.
+2. Click **New +** > **Web Service**.
+3. Select your repository: **`chandana-builds/MediVerse`**.
+4. Render will automatically detect the **Docker** runtime from the `Dockerfile`.
+5. Select the **Free** instance type.
+6. Click **Create Web Service**.
+7. In ~2 minutes, your live MediVerse healthcare application will be accessible at:
+   `https://<your-service-name>.onrender.com`
+
+> **Note on Database**: Out of the box, MediVerse uses local SQLite without requiring any external database. If you wish to connect a persistent remote MySQL database (e.g. Aiven, Clever Cloud, or TiDB Cloud), simply add `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`, and `DB_PORT` in the Render Environment Variables tab!
 
 ---
 
