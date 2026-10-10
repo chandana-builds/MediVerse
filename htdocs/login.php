@@ -1,195 +1,197 @@
 <?php
-ob_start(); // 🔴 Prevent header issues
+ob_start();
 session_start();
-include "db.php";
+include_once __DIR__ . "/db.php";
 
-// ✅ If already logged in → go to dashboard
+$error = "";
+
+// If already logged in -> go to dashboard
 if (isset($_SESSION['user_id'])) {
     header("Location: dashboard.php");
     exit();
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-    // Get form data (username or email/gmail)
-    $login_input = trim($_POST['username']);
-    $password = $_POST['password'];
+    $login_input = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
 
     if (empty($login_input) || empty($password)) {
-        echo "<script>alert('All fields are required');</script>";
+        $error = "Please fill in all required fields.";
     } else {
-
-        // Prepare secure query supporting Username or Email (Gmail)
+        // Query supporting Username or Email
         $stmt = $conn->prepare("SELECT id, username, email, password FROM users WHERE username=? OR email=?");
         $stmt->bind_param("ss", $login_input, $login_input);
         $stmt->execute();
         $result = $stmt->get_result();
 
-        if ($result->num_rows === 1) {
-
+        if ($result && $result->num_rows === 1) {
             $row = $result->fetch_assoc();
-
-            // Verify password
             if (password_verify($password, $row['password'])) {
-
-                // Create session
                 $_SESSION['user_id'] = $row['id'];
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['email'] = $row['email'];
-
-                // ✅ Redirect to dashboard
                 header("Location: dashboard.php");
                 exit();
-
             } else {
-                echo "<script>alert('❌ Incorrect password');</script>";
+                $error = "Incorrect password. Please try again.";
             }
-
         } else {
-            echo "<script>alert('❌ User not found with that Username or Email');</script>";
+            $error = "No user found with that username or email address.";
         }
-
         $stmt->close();
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>MediVerse Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediVerse - Patient Sign In</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 140px);
+            padding: 30px 20px;
+        }
 
-<style>
-body{
-    margin:0;
-    font-family:'Open Sans',sans-serif;
-    background: url("hospital-bg.png") no-repeat center;
-    background-size: cover;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            text-align: center;
+            position: relative;
+        }
 
-.login-wrap{
-    width:100%;
-    max-width:525px;
-    min-height:650px;
-    background: url("doctor.png") no-repeat center;
-    background-size: cover;
-    box-shadow: inset 0 0 200px rgba(0,0,0,0.3);
-    border-radius:20px;
-    overflow:hidden;
-    display:flex;
-}
+        .auth-tabs {
+            display: flex;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: var(--radius-full);
+            padding: 4px;
+            margin-bottom: 28px;
+            border: 1px solid var(--border-subtle);
+        }
 
-.login-php{
-    width:100%;
-    padding:60px 50px;
-    background:rgba(0,0,0,0.6);
-    color:#fff;
-}
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: var(--radius-full);
+            transition: var(--transition);
+        }
 
-.tabs{
-    display:flex;
-    gap:20px;
-    margin-bottom:40px;
-}
+        .auth-tab.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(14, 165, 233, 0.4);
+        }
 
-.tab{
-    color:#aaa;
-    font-size:20px;
-    border-bottom:2px solid transparent;
-    padding-bottom:5px;
-    text-decoration:none;
-}
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.tab.active{
-    color:#fff;
-    border-color:#1161ee;
-}
+        .demo-box {
+            background: rgba(14, 165, 233, 0.08);
+            border: 1px dashed rgba(14, 165, 233, 0.3);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 24px;
+            text-align: left;
+        }
 
-.group{
-    margin-bottom:20px;
-}
-
-.label{
-    color:#fff;
-    font-size:13px;
-    text-transform:uppercase;
-}
-
-.input{
-    width:100%;
-    padding:12px;
-    border-radius:25px;
-    border:none;
-    background:rgba(255,255,255,0.1);
-    color:white;
-    margin-top:5px;
-}
-
-.button{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:25px;
-    background:#1161ee;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
-}
-
-.button:hover{
-    background:#0d4fc0;
-}
-
-.footer{
-    text-align:center;
-    margin-top:20px;
-}
-
-.footer a{
-    color:#0dcaf0;
-    text-decoration:none;
-}
-</style>
+        .demo-box strong {
+            color: var(--primary-light);
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="login-wrap">
-<div class="login-php">
+<div class="page-backdrop">
 
-<div class="tabs">
-    <a href="login.php" class="tab active">Sign In</a>
-    <a href="register.php" class="tab">Sign Up</a>
-</div>
+    <!-- NAVBAR -->
+    <header class="med-navbar">
+        <a href="index.php" class="brand-wrapper">
+            <div class="brand-logo-icon">🩺</div>
+            <div class="brand-name">
+                MediVerse
+                <span class="brand-badge">PORTAL</span>
+            </div>
+        </a>
+        <nav class="nav-menu">
+            <a href="index.php" class="nav-link">Home</a>
+            <a href="register.php" class="btn btn-primary btn-sm">Create Account</a>
+        </nav>
+    </header>
 
-<form method="POST">
+    <!-- AUTH FORM -->
+    <div class="auth-container">
+        <div class="auth-card">
 
-    <div class="group">
-        <label class="label">Username or Email (Gmail)</label>
-        <input type="text" name="username" class="input" placeholder="Enter username or email" required>
+            <div class="auth-tabs">
+                <a href="login.php" class="auth-tab active">Sign In</a>
+                <a href="register.php" class="auth-tab">Sign Up</a>
+            </div>
+
+            <h2 style="font-size: 26px; margin-bottom: 8px;">Welcome Back</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 26px;">Sign in to access your personal medical dashboard.</p>
+
+            <?php if (!empty($error)): ?>
+                <div class="alert-error">
+                    ⚠️ <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label class="form-label">Username or Email</label>
+                    <input type="text" name="username" class="form-control" placeholder="Enter your username or email" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-full" style="margin-top: 10px;">
+                    Sign In to Portal →
+                </button>
+            </form>
+
+            <div style="margin-top: 24px; font-size: 13px; color: var(--text-muted);">
+                Don't have an account? <a href="register.php" style="color: var(--primary-light); font-weight: 600; text-decoration: none;">Create one now</a>
+            </div>
+
+        </div>
     </div>
 
-    <div class="group">
-        <label class="label">Password</label>
-        <input type="password" name="password" class="input" required>
-    </div>
+    <!-- FOOTER -->
+    <footer class="med-footer">
+        MediVerse &bull; Secure HIPAA-Compliant Healthcare Portal
+    </footer>
 
-    <div class="group">
-        <button type="submit" class="button">Sign In</button>
-    </div>
-
-</form>
-
-<div class="footer">
-    Don't have an account? <a href="register.php">Sign Up</a>
-</div>
-
-</div>
 </div>
 
 </body>

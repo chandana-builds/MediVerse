@@ -8,293 +8,519 @@ if (!isset($_SESSION['user_id'])) {
 
 include_once __DIR__ . "/db.php";
 
-$user_id = $_SESSION['user_id'];
-$username = $_SESSION['username'];
+$user_id = (int)$_SESSION['user_id'];
+$username = htmlspecialchars($_SESSION['username'] ?? 'User');
 
-// Queries
+// Fetch user stats & data safely
 $result = $conn->query("SELECT * FROM appointments WHERE user_id = $user_id ORDER BY appointment_date DESC");
 $records = $conn->query("SELECT * FROM health_records WHERE user_id = $user_id ORDER BY uploaded_at DESC");
 $reminders = $conn->query("SELECT * FROM medicine_reminders WHERE user_id = $user_id ORDER BY time_slot ASC");
 $orders = $conn->query("SELECT * FROM medicine_orders WHERE user_id = $user_id ORDER BY created_at DESC");
+
+$apt_count = $result ? $result->num_rows : 0;
+$rec_count = $records ? $records->num_rows : 0;
+$rem_count = $reminders ? $reminders->num_rows : 0;
+$ord_count = $orders ? $orders->num_rows : 0;
 ?>
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>MediVerse Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediVerse - Patient Command Center</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Greeting Header */
+        .dash-welcome {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(99, 102, 241, 0.1));
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: var(--radius-xl);
+            padding: 30px 35px;
+            backdrop-filter: blur(16px);
+        }
 
-<style>
-body{
-    margin:0;
-    font-family:'Open Sans',sans-serif;
-    background:url("hospital-bg.png") no-repeat center;
-    background-size:cover;
-    color:white;
-}
+        .welcome-text h1 {
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
 
-.overlay{
-    background:rgba(0,0,0,0.75);
-    min-height:100vh;
-    padding:20px;
-}
+        .welcome-text p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
 
-/* TOPBAR */
-.topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
+        .dash-date-badge {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-subtle);
+            padding: 10px 18px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.logout{
-    padding:8px 15px;
-    background:red;
-    border-radius:20px;
-    text-decoration:none;
-    color:white;
-}
+        /* KPI Quick Counters */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
 
-/* WELCOME */
-.welcome{
-    margin:20px 0;
-    font-size:22px;
-}
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            backdrop-filter: blur(14px);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            transition: var(--transition);
+        }
 
-/* GRID */
-.dashboard-grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-    gap:20px;
-}
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
 
-.card{
-    background:rgba(255,255,255,0.1);
-    padding:25px;
-    border-radius:15px;
-    text-align:center;
-    backdrop-filter: blur(6px);
-    transition:0.3s;
-    text-decoration:none;
-    color:white;
-}
+        .kpi-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
 
-.card:hover{
-    transform:scale(1.05);
-    background:rgba(255,255,255,0.2);
-}
+        .kpi-info .kpi-num {
+            font-size: 28px;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            color: #fff;
+            line-height: 1.1;
+        }
 
-/* EMERGENCY */
-.emergency{
-    margin:30px 0;
-    text-align:center;
-}
+        .kpi-info .kpi-title {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 2px;
+        }
 
-.emergency button{
-    background:red;
-    padding:18px 40px;
-    border:none;
-    border-radius:50px;
-    font-size:20px;
-    color:white;
-    cursor:pointer;
-}
+        /* Emergency Action Banner */
+        .emergency-banner {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(185, 28, 28, 0.28));
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            border-radius: var(--radius-lg);
+            padding: 24px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 30px -5px rgba(239, 68, 68, 0.25);
+        }
 
-/* DATA GRID */
-.data-grid{
-    display:grid;
-    grid-template-columns: repeat(2,1fr);
-    gap:20px;
-}
+        .emergency-text {
+            max-width: 600px;
+        }
 
-/* BOX */
-.box{
-    background:rgba(0,0,0,0.7);
-    padding:20px;
-    border-radius:15px;
-    overflow-x:auto;
-}
+        .emergency-text h3 {
+            color: #fca5a5;
+            font-size: 20px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-/* TABLE */
-table{
-    width:100%;
-    border-collapse:collapse;
-}
+        .emergency-text p {
+            color: #e2e8f0;
+            font-size: 14px;
+        }
 
-th{
-    background:#1161ee;
-    padding:10px;
-}
+        /* Hub Navigation Grid */
+        .hub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 16px;
+            margin-bottom: 40px;
+        }
 
-td{
-    padding:10px;
-    text-align:center;
-    background:rgba(255,255,255,0.05);
-}
+        .hub-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 20px 15px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            backdrop-filter: blur(14px);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
 
-tr:hover td{
-    background:rgba(255,255,255,0.15);
-}
+        .hub-item:hover {
+            transform: translateY(-4px);
+            background: var(--bg-card-hover);
+            border-color: rgba(56, 189, 248, 0.5);
+            box-shadow: 0 12px 25px -5px rgba(14, 165, 233, 0.25);
+        }
 
-/* RESPONSIVE */
-@media(max-width:768px){
-    .dashboard-grid, .data-grid{
-        grid-template-columns:1fr;
-    }
-}
-</style>
+        .hub-icon {
+            font-size: 32px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+        }
 
-<script>
-// 🚑 Emergency Flow
-function triggerEmergency() {
-    let confirmAction = confirm("🚑 Do you want to request an ambulance?");
-    
-    if (confirmAction) {
-        alert("🚑 Ambulance Booked Successfully!");
-        window.location.href = "emergency.php"; // next page
-    }
-}
-</script>
+        .hub-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
 
+        /* Data Section Panels */
+        .data-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 600px) {
+            .data-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .panel-header h2 {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .empty-hint {
+            text-align: center;
+            padding: 35px 20px;
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+    </style>
+    <script>
+        function triggerEmergency() {
+            if (confirm("🚑 Do you want to immediately dispatch an emergency ambulance to your current location?")) {
+                window.location.href = "emergency.php";
+            }
+        }
+    </script>
 </head>
-
 <body>
 
-<div class="overlay">
+<div class="page-backdrop">
 
-<!-- TOP -->
-<div class="topbar">
-    <h2>MediVerse Dashboard</h2>
-    <a href="logout.php" class="logout">Logout</a>
-</div>
+    <!-- NAVBAR -->
+    <header class="med-navbar">
+        <a href="index.php" class="brand-wrapper">
+            <div class="brand-logo-icon">🩺</div>
+            <div class="brand-name">
+                MediVerse
+                <span class="brand-badge">PORTAL</span>
+            </div>
+        </a>
 
-<!-- WELCOME -->
-<div class="welcome">
-    Welcome, <?php echo $username; ?> 👋
-</div>
+        <nav class="nav-menu">
+            <div class="nav-user-pill">
+                <div class="nav-user-avatar"><?php echo strtoupper(substr($username, 0, 1)); ?></div>
+                <span><?php echo $username; ?></span>
+            </div>
+            <a href="logout.php" class="btn btn-secondary btn-sm" style="color: #f87171; border-color: rgba(239,68,68,0.3);">Sign Out</a>
+        </nav>
+    </header>
 
-<!-- FEATURES -->
-<div class="dashboard-grid">
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="container">
 
-<a href="appointment.php" class="card">📅 <h3>Appointments</h3></a>
-<a href="health_records.php" class="card">📂 <h3>Health Records</h3></a>
-<a href="medicine.php" class="card">💊 <h3>Buy Medicines</h3></a>
-<a href="reminder.php" class="card">⏰ <h3>Reminders</h3></a>
-<a href="symptom.php" class="card">🧠 <h3>Symptom Checker</h3></a>
-<a href="insurance.php" class="card">💳 <h3>Insurance</h3></a>
+        <!-- WELCOME BANNER -->
+        <section class="dash-welcome">
+            <div class="welcome-text">
+                <h1>Welcome back, <span class="gradient-text"><?php echo $username; ?></span> 👋</h1>
+                <p>Access your real-time consultations, active prescription schedules, and verified digital medical vault.</p>
+            </div>
+            <div class="dash-date-badge">
+                🗓️ <?php echo date("l, F j, Y"); ?>
+            </div>
+        </section>
 
-<!-- ✅ FEATURES -->
-<a href="family.php" class="card">👨‍👩‍👧 <h3>Family Members</h3></a>
-<a href="database.php" class="card" style="border: 1px solid #00c6ff;">🗄️ <h3>Database Viewer</h3></a>
+        <!-- KPI COUNTERS -->
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8;">📅</div>
+                <div class="kpi-info">
+                    <div class="kpi-num"><?php echo $apt_count; ?></div>
+                    <div class="kpi-title">Appointments</div>
+                </div>
+            </div>
 
-</div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">⏰</div>
+                <div class="kpi-info">
+                    <div class="kpi-num"><?php echo $rem_count; ?></div>
+                    <div class="kpi-title">Medicine Reminders</div>
+                </div>
+            </div>
 
-<!-- EMERGENCY -->
-<div class="emergency">
-<button onclick="triggerEmergency()">
-🚑 EMERGENCY
-</button>
-</div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">📦</div>
+                <div class="kpi-info">
+                    <div class="kpi-num"><?php echo $ord_count; ?></div>
+                    <div class="kpi-title">Pharmacy Orders</div>
+                </div>
+            </div>
 
-<!-- DATA -->
-<div class="data-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa;">📂</div>
+                <div class="kpi-info">
+                    <div class="kpi-num"><?php echo $rec_count; ?></div>
+                    <div class="kpi-title">Health Vault Files</div>
+                </div>
+            </div>
+        </section>
 
-<!-- APPOINTMENTS -->
-<div class="box">
-<h2>📋 Appointments</h2>
-<table>
-<tr><th>Hospital</th><th>Dept</th><th>Doctor</th><th>Date</th><th>Time</th></tr>
+        <!-- EMERGENCY SOS CALLOUT -->
+        <section class="emergency-banner">
+            <div class="emergency-text">
+                <h3>🚨 Emergency Medical Dispatch Service</h3>
+                <p>One-touch instant SOS notifies nearby dispatch units and broadcasts live tracking updates to your family emergency circle.</p>
+            </div>
+            <button onclick="triggerEmergency()" class="btn btn-emergency">
+                🚑 REQUEST AMBULANCE NOW
+            </button>
+        </section>
 
-<?php
-if ($result && $result->num_rows > 0) {
-while($row = $result->fetch_assoc()) {
-echo "<tr>
-<td>{$row['hospital']}</td>
-<td>{$row['department']}</td>
-<td>{$row['doctor_name']}</td>
-<td>{$row['appointment_date']}</td>
-<td>{$row['appointment_time']}</td>
-</tr>";
-}
-} else {
-echo "<tr><td colspan='5'>No data</td></tr>";
-}
-?>
-</table>
-</div>
+        <!-- QUICK ACTION NAVIGATION HUB -->
+        <section class="hub-grid">
+            <a href="appointment.php" class="hub-item">
+                <div class="hub-icon">📅</div>
+                <div class="hub-title">Book Doctor</div>
+            </a>
+            <a href="medicine.php" class="hub-item">
+                <div class="hub-icon">💊</div>
+                <div class="hub-title">Buy Medicines</div>
+            </a>
+            <a href="reminder.php" class="hub-item">
+                <div class="hub-icon">⏰</div>
+                <div class="hub-title">Add Reminder</div>
+            </a>
+            <a href="symptom.php" class="hub-item">
+                <div class="hub-icon">🧠</div>
+                <div class="hub-title">Symptom Checker</div>
+            </a>
+            <a href="health_records.php" class="hub-item">
+                <div class="hub-icon">📂</div>
+                <div class="hub-title">Upload Records</div>
+            </a>
+            <a href="insurance.php" class="hub-item">
+                <div class="hub-icon">💳</div>
+                <div class="hub-title">Insurance</div>
+            </a>
+            <a href="family.php" class="hub-item">
+                <div class="hub-icon">👨‍👩‍👧</div>
+                <div class="hub-title">Family Circle</div>
+            </a>
+        </section>
 
-<!-- RECORDS -->
-<div class="box">
-<h2>📂 Records</h2>
-<table>
-<tr><th>Title</th><th>File</th><th>Date</th></tr>
+        <!-- RECENT DATA PANELS -->
+        <div class="data-layout">
 
-<?php
-if ($records && $records->num_rows > 0) {
-while($row = $records->fetch_assoc()) {
-echo "<tr>
-<td>{$row['title']}</td>
-<td><a href='uploads/{$row['file_name']}' target='_blank'>View</a></td>
-<td>{$row['uploaded_at']}</td>
-</tr>";
-}
-} else {
-echo "<tr><td colspan='3'>No records</td></tr>";
-}
-?>
-</table>
-</div>
+            <!-- APPOINTMENTS PANEL -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <h2>📅 Appointments (<?php echo $apt_count; ?>)</h2>
+                    <a href="appointment.php" class="btn btn-primary btn-sm">+ Book New</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="med-table">
+                        <thead>
+                            <tr>
+                                <th>Hospital</th>
+                                <th>Department</th>
+                                <th>Doctor</th>
+                                <th>Schedule</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ($result && $result->num_rows > 0): ?>
+                                <?php while($row = $result->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><strong><?php echo htmlspecialchars($row['hospital']); ?></strong></td>
+                                        <td><span class="badge badge-primary"><?php echo htmlspecialchars($row['department']); ?></span></td>
+                                        <td><?php echo htmlspecialchars($row['doctor_name']); ?></td>
+                                        <td>
+                                            <div style="font-weight: 600;"><?php echo htmlspecialchars($row['appointment_date']); ?></div>
+                                            <div style="font-size: 12px; color: var(--text-muted);"><?php echo htmlspecialchars($row['appointment_time']); ?></div>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="4" class="empty-hint">No scheduled appointments. Click "+ Book New" to reserve a slot.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-<!-- REMINDERS -->
-<div class="box">
-<h2>⏰ Reminders</h2>
-<table>
-<tr><th>Medicine</th><th>Time</th><th>Notes</th></tr>
+            <!-- REMINDERS PANEL -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <h2>⏰ Medication Schedule (<?php echo $rem_count; ?>)</h2>
+                    <a href="reminder.php" class="btn btn-primary btn-sm">+ Add Reminder</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="med-table">
+                        <thead>
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Time Slot</th>
+                                <th>Clinical Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ($reminders && $reminders->num_rows > 0): ?>
+                                <?php while($row = $reminders->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><strong>💊 <?php echo htmlspecialchars($row['medicine_name']); ?></strong></td>
+                                        <td><span class="badge badge-warning">⏰ <?php echo htmlspecialchars($row['time_slot']); ?></span></td>
+                                        <td style="color: var(--text-muted); font-size: 13px;"><?php echo htmlspecialchars($row['notes'] ?: 'No special notes'); ?></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="3" class="empty-hint">No medicine reminders configured yet.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-<?php
-if ($reminders && $reminders->num_rows > 0) {
-while($row = $reminders->fetch_assoc()) {
-echo "<tr>
-<td>{$row['medicine_name']}</td>
-<td>{$row['time_slot']}</td>
-<td>{$row['notes']}</td>
-</tr>";
-}
-} else {
-echo "<tr><td colspan='3'>No reminders</td></tr>";
-}
-?>
-</table>
-</div>
+            <!-- PHARMACY ORDERS PANEL -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <h2>📦 Pharmacy Orders (<?php echo $ord_count; ?>)</h2>
+                    <a href="medicine.php" class="btn btn-primary btn-sm">Order Meds</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="med-table">
+                        <thead>
+                            <tr>
+                                <th>Medicine</th>
+                                <th>Qty</th>
+                                <th>Pharmacy</th>
+                                <th>Prescription</th>
+                                <th>Payment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ($orders && $orders->num_rows > 0): ?>
+                                <?php while($row = $orders->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><strong><?php echo htmlspecialchars($row['medicine_name']); ?></strong></td>
+                                        <td><?php echo (int)$row['quantity']; ?></td>
+                                        <td style="font-size: 13px; color: var(--text-muted);"><?php echo htmlspecialchars($row['store_name']); ?></td>
+                                        <td>
+                                            <?php if (!empty($row['prescription_file'])): ?>
+                                                <a href="<?php echo htmlspecialchars($row['prescription_file']); ?>" target="_blank" class="badge badge-success" style="text-decoration:none;">📄 Verified</a>
+                                            <?php else: ?>
+                                                <span class="badge" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">Standard</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><span class="badge badge-primary"><?php echo htmlspecialchars($row['payment_method']); ?></span></td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="5" class="empty-hint">No orders placed yet. Browse the pharmacy catalog to order.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-<!-- ORDERS -->
-<div class="box">
-<h2>💊 Orders</h2>
-<table>
-<tr><th>Medicine</th><th>Qty</th><th>Store</th><th>Prescription</th><th>Payment</th></tr>
+            <!-- HEALTH RECORDS PANEL -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <h2>📂 Health Vault Documents (<?php echo $rec_count; ?>)</h2>
+                    <a href="health_records.php" class="btn btn-primary btn-sm">+ Upload Doc</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="med-table">
+                        <thead>
+                            <tr>
+                                <th>Report Title</th>
+                                <th>Uploaded Date</th>
+                                <th>Document</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ($records && $records->num_rows > 0): ?>
+                                <?php while($row = $records->fetch_assoc()): ?>
+                                    <tr>
+                                        <td><strong>📄 <?php echo htmlspecialchars($row['title']); ?></strong></td>
+                                        <td style="color: var(--text-muted); font-size: 13px;"><?php echo htmlspecialchars($row['uploaded_at']); ?></td>
+                                        <td>
+                                            <a href="uploads/<?php echo htmlspecialchars($row['file_name']); ?>" target="_blank" class="btn btn-secondary btn-sm" style="padding: 4px 10px;">View Report ↗</a>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="3" class="empty-hint">No health records uploaded yet.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-<?php
-if ($orders && $orders->num_rows > 0) {
-while($row = $orders->fetch_assoc()) {
+        </div>
 
-$prescription = ($row['prescription_required'] && !empty($row['prescription_file']))
-? "<a href='{$row['prescription_file']}' target='_blank'>View</a>"
-: "Not Required";
+    </main>
 
-echo "<tr>
-<td>{$row['medicine_name']}</td>
-<td>{$row['quantity']}</td>
-<td>{$row['store_name']}</td>
-<td>$prescription</td>
-<td>{$row['payment_method']}</td>
-</tr>";
-}
-} else {
-echo "<tr><td colspan='5'>No orders</td></tr>";
-}
-?>
-</table>
-</div>
-
-</div>
+    <!-- FOOTER -->
+    <footer class="med-footer">
+        MediVerse Digital Healthcare Ecosystem &bull; Logged in as <strong><?php echo $username; ?></strong>
+    </footer>
 
 </div>
 

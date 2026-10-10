@@ -3,243 +3,234 @@ session_start();
 
 include_once __DIR__ . "/db.php";
 
-// Check login
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
+$user_id = (int)$_SESSION['user_id'];
+$username = htmlspecialchars($_SESSION['username'] ?? 'User');
+$success_msg = "";
+$error_msg = "";
+
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $hospital = trim($_POST['hospital'] ?? '');
+    $department = trim($_POST['department'] ?? '');
+    $doctor = trim($_POST['doctor'] ?? '');
+    $date = trim($_POST['date'] ?? '');
+    $time = trim($_POST['time'] ?? '');
 
-    $user_id = $_SESSION['user_id'];
-    $hospital = $_POST['hospital'];
-    $department = $_POST['department'];
-    $doctor = $_POST['doctor'];
-    $date = $_POST['date'];
-    $time = $_POST['time'];
-
-    // Basic validation
-    if (empty($time)) {
-        echo "<script>alert('Please select a time slot');</script>";
+    if (empty($hospital) || empty($department) || empty($doctor) || empty($date) || empty($time)) {
+        $error_msg = "Please fill in all appointment fields and choose a time slot.";
     } else {
-
         $stmt = $conn->prepare("INSERT INTO appointments 
-        (user_id, hospital, department, doctor_name, appointment_date, appointment_time)
-        VALUES (?, ?, ?, ?, ?, ?)");
+            (user_id, hospital, department, doctor_name, appointment_date, appointment_time)
+            VALUES (?, ?, ?, ?, ?, ?)");
 
         $stmt->bind_param("isssss", $user_id, $hospital, $department, $doctor, $date, $time);
 
         if ($stmt->execute()) {
-            echo "<script>alert('Appointment Booked Successfully!'); window.location='dashboard.php';</script>";
+            $success_msg = "Appointment scheduled successfully! You can view it in your dashboard.";
+            echo "<script>setTimeout(() => { window.location='dashboard.php'; }, 1600);</script>";
         } else {
-            echo "<script>alert('Error booking appointment');</script>";
+            $error_msg = "Database error booking appointment: " . $stmt->error;
         }
-
         $stmt->close();
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Book Appointment</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediVerse - Book Doctor Appointment</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
 
-<style>
-body{
-    margin:0;
-    font-family:'Open Sans',sans-serif;
-    background:url("hospital-bg.png") no-repeat center;
-    background-size:cover;
-    color:white;
-}
+        .booking-card {
+            max-width: 640px;
+            margin: 0 auto;
+        }
 
-.overlay{
-    background:rgba(0,0,0,0.75);
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 10px;
+            margin-top: 8px;
+        }
 
-.form-box{
-    background:rgba(255,255,255,0.1);
-    padding:30px;
-    border-radius:15px;
-    width:400px;
-    backdrop-filter: blur(6px);
-}
+        .slot-pill {
+            padding: 12px 10px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-main);
+        }
 
-h2{
-    text-align:center;
-    margin-bottom:20px;
-}
+        .slot-pill:hover {
+            border-color: var(--primary-light);
+            background: rgba(14, 165, 233, 0.15);
+            transform: translateY(-2px);
+        }
 
-.group{
-    margin-bottom:15px;
-}
+        .slot-pill.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border-color: #34d399;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+    </style>
+    <script>
+        function updateDoctors() {
+            const dept = document.getElementById("department").value;
+            const doctorSelect = document.getElementById("doctor");
+            let options = '<option value="">-- Choose Specialist --</option>';
 
-label{
-    font-size:14px;
-}
+            if (dept === "General Medicine") {
+                options += '<option value="Dr. Ramesh Reddy (MD, Internal Med)">Dr. Ramesh Reddy (MD, Internal Med)</option>';
+                options += '<option value="Dr. Sunita Kumar (MBBS, Consultant)">Dr. Sunita Kumar (MBBS, Consultant)</option>';
+            } else if (dept === "Cardiology") {
+                options += '<option value="Dr. Arvind Sharma (DM, Senior Cardiologist)">Dr. Arvind Sharma (DM, Senior Cardiologist)</option>';
+                options += '<option value="Dr. Priya Menon (Interventional Cardiology)">Dr. Priya Menon (Interventional Cardiology)</option>';
+            } else if (dept === "Neurology") {
+                options += '<option value="Dr. Vikram Mehta (MCh, Neuro Specialist)">Dr. Vikram Mehta (MCh, Neuro Specialist)</option>';
+            } else if (dept === "Pediatrics") {
+                options += '<option value="Dr. Ananya Roy (DNB, Child Specialist)">Dr. Ananya Roy (DNB, Child Specialist)</option>';
+            }
+            doctorSelect.innerHTML = options;
+        }
 
-select, input{
-    width:100%;
-    padding:10px;
-    margin-top:5px;
-    border:none;
-    border-radius:10px;
-}
-
-.slots{
-    display:grid;
-    grid-template-columns: repeat(2,1fr);
-    gap:10px;
-    margin-top:10px;
-}
-
-.slot{
-    padding:10px;
-    background:#1161ee;
-    border-radius:10px;
-    text-align:center;
-    cursor:pointer;
-}
-
-.slot:hover{
-    background:#0d4fc0;
-}
-
-button{
-    width:100%;
-    padding:12px;
-    margin-top:20px;
-    background:#00c6ff;
-    border:none;
-    border-radius:25px;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
-}
-
-button:hover{
-    background:#009acb;
-}
-
-.back{
-    display:block;
-    text-align:center;
-    margin-top:15px;
-    color:#0dcaf0;
-    text-decoration:none;
-}
-</style>
-
-<script>
-// Dynamic doctors based on department
-function updateDoctors(){
-    let dept = document.getElementById("department").value;
-    let doctor = document.getElementById("doctor");
-
-    let options = "";
-
-    if(dept === "General Medicine"){
-        options = "<option>Dr. Reddy</option><option>Dr. Kumar</option>";
-    }
-    else if(dept === "Cardiology"){
-        options = "<option>Dr. Sharma</option>";
-    }
-    else if(dept === "Neurology"){
-        options = "<option>Dr. Mehta</option>";
-    }
-
-    doctor.innerHTML = options;
-}
-
-// Slot selection
-function selectSlot(event, time){
-    document.getElementById("selected_time").value = time;
-
-    let slots = document.querySelectorAll(".slot");
-    slots.forEach(s => s.style.background = "#1161ee");
-
-    if (event && event.currentTarget) {
-        event.currentTarget.style.background = "green";
-    }
-}
-</script>
-
+        function selectSlot(event, time) {
+            document.getElementById("selected_time").value = time;
+            document.querySelectorAll(".slot-pill").forEach(s => s.classList.remove("active"));
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add("active");
+            }
+        }
+    </script>
 </head>
-
 <body>
 
-<div class="overlay">
-<div class="form-box">
+<div class="page-backdrop">
 
-<h2>📅 Book Appointment</h2>
+    <!-- NAVBAR -->
+    <header class="med-navbar">
+        <a href="index.php" class="brand-wrapper">
+            <div class="brand-logo-icon">🩺</div>
+            <div class="brand-name">
+                MediVerse
+                <span class="brand-badge">APPOINTMENTS</span>
+            </div>
+        </a>
+        <nav class="nav-menu">
+            <a href="dashboard.php" class="nav-link">📊 Dashboard</a>
+            <a href="dashboard.php" class="btn btn-secondary btn-sm">⬅ Back</a>
+        </nav>
+    </header>
 
-<form method="POST">
+    <!-- CONTENT -->
+    <main class="container">
 
-    <!-- Hospital -->
-    <div class="group">
-        <label>Select Hospital</label>
-        <select name="hospital" required>
-            <option value="">-- Choose Hospital --</option>
-            <option>City Care Hospital</option>
-            <option>MediLife Clinic</option>
-            <option>Sunrise Hospital</option>
-        </select>
-    </div>
-
-    <!-- Department -->
-    <div class="group">
-        <label>Department</label>
-        <select name="department" id="department" onchange="updateDoctors()" required>
-            <option value="">Select Department</option>
-            <option>General Medicine</option>
-            <option>Cardiology</option>
-            <option>Neurology</option>
-        </select>
-    </div>
-
-    <!-- Doctor -->
-    <div class="group">
-        <label>Doctor</label>
-        <select name="doctor" id="doctor" required>
-            <option>Select Department First</option>
-        </select>
-    </div>
-
-    <!-- Date -->
-    <div class="group">
-        <label>Preferred Date</label>
-        <input type="date" name="date" required>
-    </div>
-
-    <!-- Slots -->
-    <div class="group">
-        <label>Available Slots</label>
-
-        <div class="slots">
-            <div class="slot" onclick="selectSlot(event, '09:00 AM')">09:00 AM</div>
-            <div class="slot" onclick="selectSlot(event, '10:30 AM')">10:30 AM</div>
-            <div class="slot" onclick="selectSlot(event, '02:00 PM')">02:00 PM</div>
-            <div class="slot" onclick="selectSlot(event, '04:30 PM')">04:30 PM</div>
-            <div class="slot" onclick="selectSlot(event, '06:00 PM')">06:00 PM</div>
+        <div class="page-header">
+            <div>
+                <h2>📅 Book a Specialist Consultation</h2>
+                <p style="color: var(--text-muted); font-size: 14px;">Select certified clinic branch, department, and doctor to secure your slot.</p>
+            </div>
+            <a href="dashboard.php" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
         </div>
 
-        <input type="hidden" name="time" id="selected_time" required>
-    </div>
+        <div class="glass-panel booking-card">
 
-    <button type="submit">Confirm Booking</button>
+            <?php if (!empty($success_msg)): ?>
+                <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #6ee7b7; padding: 14px; border-radius: var(--radius-md); margin-bottom: 20px;">
+                    ✅ <?php echo htmlspecialchars($success_msg); ?>
+                </div>
+            <?php endif; ?>
 
-</form>
+            <?php if (!empty($error_msg)): ?>
+                <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; padding: 14px; border-radius: var(--radius-md); margin-bottom: 20px;">
+                    ⚠️ <?php echo htmlspecialchars($error_msg); ?>
+                </div>
+            <?php endif; ?>
 
-<a href="dashboard.php" class="back">← Back to Dashboard</a>
+            <form method="POST">
 
-</div>
+                <div class="form-group">
+                    <label class="form-label">1. Select Hospital / Clinic Branch</label>
+                    <select name="hospital" class="form-control" required>
+                        <option value="">-- Choose Partner Facility --</option>
+                        <option value="City Care Multi-Speciality Hospital">City Care Multi-Speciality Hospital</option>
+                        <option value="MediLife Clinic & Diagnostics">MediLife Clinic & Diagnostics</option>
+                        <option value="Sunrise Super-Speciality Hospital">Sunrise Super-Speciality Hospital</option>
+                        <option value="Apollo Healthcare Center">Apollo Healthcare Center</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">2. Clinical Department</label>
+                    <select name="department" id="department" class="form-control" onchange="updateDoctors()" required>
+                        <option value="">-- Select Department --</option>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">3. Doctor / Specialist</label>
+                    <select name="doctor" id="doctor" class="form-control" required>
+                        <option value="">Select Department First</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">4. Consultation Date</label>
+                    <input type="date" name="date" class="form-control" min="<?php echo date('Y-m-d'); ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">5. Available Time Slots</label>
+                    <div class="slots-grid">
+                        <div class="slot-pill" onclick="selectSlot(event, '09:00 AM')">09:00 AM</div>
+                        <div class="slot-pill" onclick="selectSlot(event, '10:30 AM')">10:30 AM</div>
+                        <div class="slot-pill" onclick="selectSlot(event, '12:00 PM')">12:00 PM</div>
+                        <div class="slot-pill" onclick="selectSlot(event, '02:00 PM')">02:00 PM</div>
+                        <div class="slot-pill" onclick="selectSlot(event, '04:30 PM')">04:30 PM</div>
+                        <div class="slot-pill" onclick="selectSlot(event, '06:00 PM')">06:00 PM</div>
+                    </div>
+                    <input type="hidden" name="time" id="selected_time" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-full" style="margin-top: 15px;">
+                    Confirm Appointment Booking 📅
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <footer class="med-footer">
+        MediVerse Appointments &bull; Verified Certified Doctors
+    </footer>
+
 </div>
 
 </body>

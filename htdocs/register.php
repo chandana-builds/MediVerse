@@ -1,52 +1,51 @@
 <?php
-include "db.php";
+session_start();
+include_once __DIR__ . "/db.php";
+
+$error = "";
+$success = "";
+
+if (isset($_SESSION['user_id'])) {
+    header("Location: dashboard.php");
+    exit();
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $confirm = $_POST['confirm_password'] ?? '';
 
-    // Get form data safely
-    $username = trim($_POST['username']);
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-    $confirm = $_POST['confirm_password'];
-
-    // Basic validation
     if (empty($username) || empty($email) || empty($password) || empty($confirm)) {
-        echo "<script>alert('All fields are required');</script>";
-    }
-    elseif ($password !== $confirm) {
-        echo "<script>alert('Passwords do not match');</script>";
-    }
-    else {
-
-        // Check if username or email already exists
+        $error = "All fields are required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Please enter a valid email address.";
+    } elseif ($password !== $confirm) {
+        $error = "Passwords do not match.";
+    } elseif (strlen($password) < 6) {
+        $error = "Password must be at least 6 characters.";
+    } else {
+        // Check for existing username or email
         $check = $conn->prepare("SELECT id FROM users WHERE username=? OR email=?");
         $check->bind_param("ss", $username, $email);
         $check->execute();
         $check->store_result();
 
         if ($check->num_rows > 0) {
-            echo "<script>alert('Username or Email already registered');</script>";
+            $error = "Username or Email is already registered.";
         } else {
-
-            // Hash password securely
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-            // Insert user
+            $hashed = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $username, $email, $hashed_password);
+            $stmt->bind_param("sss", $username, $email, $hashed);
 
             if ($stmt->execute()) {
-                echo "<script>
-                        alert('Registration Successful');
-                        window.location='login.php';
-                      </script>";
+                $success = "Account created successfully! Redirecting to sign in...";
+                echo "<script>setTimeout(() => { window.location='login.php'; }, 1500);</script>";
             } else {
-                echo "<script>alert('Something went wrong');</script>";
+                $error = "Failed to register account. Please try again.";
             }
-
             $stmt->close();
         }
-
         $check->close();
     }
 }
@@ -54,149 +53,158 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>MediVerse Register</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediVerse - Patient Registration</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 140px);
+            padding: 30px 20px;
+        }
 
-<style>
-body{
-    margin:0;
-    font-family:'Open Sans',sans-serif;
-    background: url("hospital-bg.png") no-repeat center;
-    background-size: cover;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+        .auth-card {
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            text-align: center;
+            position: relative;
+        }
 
-.login-wrap{
-    width:100%;
-    max-width:525px;
-    min-height:650px;
-    background:  url("doctor.png") no-repeat center;
-    background-size: cover;
-    box-shadow: inset 0 0 200px rgba(0,0,0,0.3);
-    border-radius:20px;
-    overflow:hidden;
-    display: flex;
-    position:relative;
-}
+        .auth-tabs {
+            display: flex;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: var(--radius-full);
+            padding: 4px;
+            margin-bottom: 28px;
+            border: 1px solid var(--border-subtle);
+        }
 
-.login-php{
-    width: 100%;
-    flex-grow: 1;
-    padding:60px 50px;
-    background:rgba(0,0,0,0.6);
-    color:#fff;
-  
-}
-.tabs{
-    display:flex;
-    gap:20px;
-    margin-bottom:40px;
-}
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: var(--radius-full);
+            transition: var(--transition);
+        }
 
-.tab{
-    color:#aaa;
-    font-size:20px;
-    border-bottom:2px solid transparent;
-    padding-bottom:5px;
-    text-decoration:none;
-}
+        .auth-tab.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(14, 165, 233, 0.4);
+        }
 
-.tab.active{
-    color:#fff;
-    border-color:#1161ee;
-}
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            color: #fca5a5;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
 
-.group{
-    margin-bottom:20px;
-}
-
-.label{
-    color:#fff;
-    text-transform: uppercase;
-    font-size:13px;
-}
-
-.input{
-    width:100%;
-    padding:12px;
-    border-radius:25px;
-    border:none;
-    background:rgba(255,255,255,0.1);
-    color:white;
-    margin-top:5px;
-}
-
-.button{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:25px;
-    background:#1161ee;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
-}
-
-.button:hover{
-    background:#0d4fc0;
-}
-
-.footer{
-    text-align:center;
-    margin-top:20px;
-}
-
-.footer a{
-    color:#0dcaf0;
-    text-decoration:none;
-}
-</style>
+        .alert-success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: #6ee7b7;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="login-wrap">
-<div class="login-php">
+<div class="page-backdrop">
 
-<div class="tabs">
-    <a href="login.php" class="tab">Sign In</a>
-    <a href="register.php" class="tab active">Sign Up</a>
-</div>
+    <!-- NAVBAR -->
+    <header class="med-navbar">
+        <a href="index.php" class="brand-wrapper">
+            <div class="brand-logo-icon">🩺</div>
+            <div class="brand-name">
+                MediVerse
+                <span class="brand-badge">PORTAL</span>
+            </div>
+        </a>
+        <nav class="nav-menu">
+            <a href="index.php" class="nav-link">Home</a>
+            <a href="login.php" class="btn btn-secondary btn-sm">Sign In</a>
+        </nav>
+    </header>
 
-<form method="POST">
-    <div class="group">
-        <label class="label">Username</label>
-        <input type="text" name="username" class="input" required>
+    <!-- AUTH FORM -->
+    <div class="auth-container">
+        <div class="auth-card">
+
+            <div class="auth-tabs">
+                <a href="login.php" class="auth-tab">Sign In</a>
+                <a href="register.php" class="auth-tab active">Sign Up</a>
+            </div>
+
+            <h2 style="font-size: 26px; margin-bottom: 8px;">Create Your Account</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 26px;">Join the MediVerse healthcare network for instant care.</p>
+
+            <?php if (!empty($error)): ?>
+                <div class="alert-error">⚠️ <?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+
+            <?php if (!empty($success)): ?>
+                <div class="alert-success">✅ <?php echo htmlspecialchars($success); ?></div>
+            <?php endif; ?>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" placeholder="Choose a unique username" value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" name="email" class="form-control" placeholder="yourname@gmail.com" value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Create a strong password (min 6 chars)" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" name="confirm_password" class="form-control" placeholder="Re-enter password to confirm" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-full" style="margin-top: 10px;">
+                    Complete Registration 🚀
+                </button>
+            </form>
+
+            <div style="margin-top: 24px; font-size: 13px; color: var(--text-muted);">
+                Already have an account? <a href="login.php" style="color: var(--primary-light); font-weight: 600; text-decoration: none;">Sign in here</a>
+            </div>
+
+        </div>
     </div>
 
-    <div class="group">
-        <label class="label">Email (Gmail)</label>
-        <input type="email" name="email" class="input" placeholder="e.g. yourname@gmail.com" required>
-    </div>
+    <!-- FOOTER -->
+    <footer class="med-footer">
+        MediVerse &bull; Secure Healthcare Management
+    </footer>
 
-    <div class="group">
-        <label class="label">Password</label>
-        <input type="password" name="password" class="input" required>
-    </div>
-
-    <div class="group">
-        <label class="label">Confirm Password</label>
-        <input type="password" name="confirm_password" class="input" required>
-    </div>
-
-    <div class="group">
-        <button type="submit" class="button">Sign Up</button>
-    </div>
-</form>
-
-<div class="footer">
-    Already have an account? <a href="login.php">Sign In</a>
-</div>
-
-</div>
 </div>
 
 </body>
