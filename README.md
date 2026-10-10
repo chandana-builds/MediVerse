@@ -1,94 +1,171 @@
-# MediVerse - Smart Healthcare Platform 🏥
+<div align="center">
 
-MediVerse is a comprehensive, modern digital healthcare web platform built to connect patients with integrated medical services, consultations, health records, emergency SOS response, and online pharmacy management.
+# 🩺 MediVerse
+### Next-Gen Smart Healthcare & Clinical Care Management Platform
 
----
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-mediverse--kcgx.onrender.com-0284c7?style=for-the-badge&logo=render&logoColor=white)](https://mediverse-kcgx.onrender.com/)
+[![PHP Version](https://img.shields.io/badge/PHP-8.3-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Database](https://img.shields.io/badge/Database-SQLite%20%7C%20MySQL-00758F?style=for-the-badge&logo=mysql&logoColor=white)](schema.sql)
+[![License](https://img.shields.io/badge/License-MIT-059669?style=for-the-badge)](LICENSE)
 
-## 🌟 Key Features
+<br />
 
-- **🔐 Secure Authentication**: Patient registration, login, and session-managed routes with BCrypt password hashing.
-- **📊 Interactive Dashboard**: Central patient dashboard providing an overview of scheduled appointments, records, reminders, and active pharmacy orders.
-- **📅 Doctor Appointment Booking**: Select hospitals, filter departments, dynamically assign doctors, and choose preferred appointment dates and time slots.
-- **💊 Online Pharmacy & Prescriptions**: Browse medicines, purchase over-the-counter medications, or upload prescriptions for prescription-required drugs.
-- **⏰ Medication Reminders**: Schedule daily medication reminders with dosage times and instructions.
-- **📂 Digital Health Records**: Upload, store, and view medical reports and test results securely.
-- **🧠 AI / Smart Symptom Checker**: Input symptoms, duration, and severity to receive immediate guidance on potential conditions and recommended medical departments.
-- **💳 Health Insurance Management**: Track policies, insurance providers, coverage limits, validity dates, and upload policy documentation.
-- **👨‍👩‍👧 Family Emergency Circle**: Maintain emergency contacts with relationship labels, contact details, and availability status.
-- **🚑 Instant Emergency SOS Dispatch**: One-click ambulance request with real-time tracking simulation, driver assignment, and emergency contact alerts.
+**[🌐 Visit Live Website Demo](https://mediverse-kcgx.onrender.com/)** &nbsp;&bull;&nbsp; **[📖 Explore Documentation](#-key-features)** &nbsp;&bull;&nbsp; **[🚀 Local Quickstart](#-quickstart--local-setup)**
+
+</div>
 
 ---
 
-## 🚀 Getting Started
+## 🌟 Live Demo
+
+> 🚀 **The platform is deployed live on Render:**  
+> 👉 **[https://mediverse-kcgx.onrender.com/](https://mediverse-kcgx.onrender.com/)**
+> 
+> *Feel free to register a new patient account or test appointment bookings, prescription orders, and AI triage directly in the cloud environment.*
+
+---
+
+## 📖 Overview
+
+**MediVerse** is an integrated, full-stack digital healthcare web platform crafted to streamline patient consultations, e-pharmacy orders, medical records archiving, algorithmic symptom triage, and rapid emergency ambulance dispatch.
+
+Designed with a **professional, warm clinical aesthetic** inspired by modern healthcare leaders, MediVerse pairs a clean, human-centered UI with robust backend security and universal database portability.
+
+---
+
+## ✨ Key Features
+
+### 📅 Smart Doctor Consultations
+- Select verified medical branches across top partner hospitals.
+- Dynamic specialist filtering across **Cardiology**, **Neurology**, **Pediatrics**, and **General Medicine**.
+- Interactive appointment date picker and time-slot reservation pills with instant scheduling.
+
+### 🚑 One-Touch Emergency SOS Dispatch
+- Rapid paramedic dispatch with simulated real-time GPS telemetry and estimated arrival times (ETA).
+- Automatic broadcast to the patient's registered family emergency circle via integrated alert hooks.
+
+### 💊 Certified E-Pharmacy & Prescription Orders
+- Searchable catalog of authentic medications with live stock and price indicators.
+- Seamless dual-flow purchasing: direct **Over-The-Counter (OTC)** checkout or mandatory **Prescription Verification (Rx)** upload (PDF, JPG, PNG).
+- Dynamic cart subtotal calculator with Cash on Delivery (COD) and Online Payment options.
+
+### 🧠 Algorithmic Symptom Triage Assistant
+- Interactive symptom chip selector (Fever, Cough, Headache, Chest Pain, Stomach Pain, etc.).
+- Multi-parameter clinical analysis factoring in duration and severity to route patients to the correct medical department.
+- High-priority cardiac warning alerts advising immediate emergency intervention when severe symptoms are detected.
+
+### 📂 Encrypted Health Vault
+- Secure diagnostic record archive for lab test summaries, blood work, radiology scans, and doctor prescriptions.
+- Direct inline file viewing and download management.
+
+### ⏰ Daily Medication Reminders
+- Schedule personalized dosage times and meal-relative clinical notes (e.g., *"1 tablet after breakfast"*).
+- Visual timeline schedule directly within the patient dashboard.
+
+### 💳 Insurance Portfolio & 👨‍👩‍👧 Family Circle
+- Track policy coverage amounts, expiration dates, warning alerts, and automated 80% claim estimation calculations.
+- Register family contacts with emergency relationship tags and 24/7 availability status.
+
+---
+
+## 🛠️ Architecture & Tech Stack
+
+| Layer | Technology | Description |
+| :--- | :--- | :--- |
+| **Frontend UI** | HTML5, CSS3, Vanilla JS | Custom warm healthcare design system (`style.css`), Google Fonts (*Outfit* & *Plus Jakarta Sans*), responsive grid layout |
+| **Backend** | PHP 8.3 | Clean MVC-like modular scripts, session authentication, prepared statements |
+| **Database** | SQLite3 & MySQL / MariaDB | Universal DB connector (`htdocs/db.php`) supporting zero-config local SQLite and cloud MySQL |
+| **Containerization**| Docker & Apache | Multi-stage production container with dynamic port binding (`docker-entrypoint.sh`) |
+| **Cloud Hosting** | Render | Deployed as a high-availability Docker web service with automatic SSL |
+
+---
+
+## 🚀 Quickstart & Local Setup
 
 ### Prerequisites
-- **PHP 8.0+** (with `mysqli` and `sqlite3` extensions enabled)
-- A web browser (Google Chrome, Microsoft Edge, Firefox, etc.)
+- **PHP 8.0+** (with `pdo_sqlite` and `pdo_mysql` extensions enabled)
+- Any modern web browser
 
-### Running Locally (1-Click)
-Double-click the [`run.bat`](run.bat) file or run:
-```bash
+### 1-Click Launch (Windows)
+Double-click [`run.bat`](run.bat) or execute from the terminal:
+```bat
 ./run.bat
 ```
-This automatically boots the PHP server and opens `http://localhost:8000` in your default browser.
+*This automatically boots the PHP server with custom `php.ini` extensions and opens `http://localhost:8000` in your browser.*
 
-### Manual Launch
-Start PHP's built-in server pointing to the `htdocs` directory:
+### Manual Terminal Launch
 ```bash
-php -S localhost:8000 -t htdocs
+# Clone the repository
+git clone https://github.com/chandana-builds/MediVerse.git
+cd MediVerse
+
+# Start PHP built-in server
+php -S localhost:8000 -c php.ini -t htdocs
 ```
-Then navigate to [http://localhost:8000](http://localhost:8000).
+Visit **`http://localhost:8000`** in your browser.
 
 ---
 
-## 🌐 Deploy to Render (Free 1-Click Cloud Deployment)
+## 🌐 Deploy to Render
 
-MediVerse includes a production-ready [`Dockerfile`](Dockerfile) and [`render.yaml`](render.yaml) configured specifically for Render's free tier.
+MediVerse is pre-configured with a production [`Dockerfile`](Dockerfile) and [`render.yaml`](render.yaml) specification:
 
-### Quick Deploy via Render:
-1. Go to [render.com](https://render.com) and sign in with your GitHub account.
-2. Click **New +** > **Web Service**.
-3. Select your repository: **`chandana-builds/MediVerse`**.
-4. Render will automatically detect the **Docker** runtime from the `Dockerfile`.
-5. Select the **Free** instance type.
-6. Click **Create Web Service**.
-7. In ~2 minutes, your live MediVerse healthcare application will be accessible at:
-   `https://<your-service-name>.onrender.com`
+1. Fork or push your code to GitHub.
+2. Sign in to [render.com](https://render.com) and click **New + > Web Service**.
+3. Connect your **`MediVerse`** repository.
+4. Render will automatically detect the **Docker** environment.
+5. Select the **Free** instance type and click **Create Web Service**.
+6. Your cloud URL will be live in ~2 minutes!
 
-> **Note on Database**: Out of the box, MediVerse uses local SQLite without requiring any external database. If you wish to connect a persistent remote MySQL database (e.g. Aiven, Clever Cloud, or TiDB Cloud), simply add `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`, and `DB_PORT` in the Render Environment Variables tab!
+*(Optional) To connect a persistent cloud MySQL database (e.g., Aiven or TiDB), define `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`, and `DB_PORT` in your Render Environment Variables.*
 
 ---
 
-## 📂 Project Structure
+## 📂 Project Directory Structure
 
 ```text
 ├── htdocs/
-│   ├── appointment.php         # Doctor appointment booking
-│   ├── checkout.php            # Medicine checkout flow
-│   ├── dashboard.php          # Main patient dashboard
-│   ├── db.php                 # Universal database connector & adapter
-│   ├── emergency.php          # Ambulance SOS dispatch & live tracking
-│   ├── family.php             # Family contacts management
-│   ├── health_records.php     # Medical report uploads & viewing
-│   ├── index.php              # Landing page
-│   ├── insurance.php          # Health insurance policy manager
-│   ├── login.php              # User login
-│   ├── logout.php             # User logout & session destroy
-│   ├── medicine.php           # Pharmacy medicine catalog
-│   ├── place_order.php        # Medicine order processor
-│   ├── register.php           # User account registration
-│   ├── reminder.php           # Medication reminder scheduler
-│   ├── symptom.php            # Symptom assessment tool
-│   ├── upload_prescription.php# Prescription document uploader
-│   ├── uploads/               # Uploaded reports & prescriptions
-│   └── *.png                  # UI background assets
-├── run.bat                    # 1-click Windows launcher
-├── schema.sql                 # Complete MySQL schema & seed data
-├── php.ini                    # Local PHP configuration
+│   ├── style.css              # Unified clinical design system (warm light theme)
+│   ├── index.php              # Modern healthcare landing page
+│   ├── dashboard.php          # Central patient command center
+│   ├── login.php              # Patient authentication & session portal
+│   ├── register.php           # New user registration & validation
+│   ├── appointment.php        # Doctor appointment scheduling module
+│   ├── medicine.php           # E-Pharmacy catalog & instant search filter
+│   ├── checkout.php           # Direct OTC checkout & payment processing
+│   ├── upload_prescription.php# Prescription document verification upload
+│   ├── place_order.php        # Secure prepared-statement order handler
+│   ├── symptom.php            # Algorithmic clinical symptom triage tool
+│   ├── reminder.php           # Medication reminder scheduler & table
+│   ├── health_records.php     # Diagnostic records vault & file upload
+│   ├── insurance.php          # Insurance policies & claim estimation
+│   ├── family.php             # Emergency contact network manager
+│   ├── emergency.php          # Ambulance SOS dispatch & telemetry tracking
+│   ├── db.php                 # Universal database abstraction connector
+│   ├── logout.php             # Session destruction & sign-out handler
+│   ├── uploads/               # Secure uploaded patient files & prescriptions
+│   └── *.png                  # Hospital background assets
+├── Dockerfile                 # Production container build recipe
+├── docker-entrypoint.sh       # Dynamic port binding entrypoint
+├── render.yaml                # Render cloud deployment blueprint
+├── .dockerignore              # Container build exclusions
+├── run.bat                    # 1-Click local Windows launcher
+├── schema.sql                 # Complete MySQL schema & seed catalog
+├── php.ini                    # Local PHP module & upload configuration
 └── README.md                  # Project documentation
 ```
 
 ---
 
+## 🔒 Security & Privacy
+
+- **Password Protection**: User passwords are encrypted using PHP's native `password_hash()` utilizing the secure BCrypt algorithm.
+- **SQL Injection Prevention**: All order processing, authentication, appointments, and record lookups use parameterized prepared statements (`$stmt->bind_param()`).
+- **Data Privacy**: Database internals and administrative queries are isolated to the backend development environment and never exposed to the public UI.
+
+---
+
 ## 📄 License
-Open source under the [MIT License](LICENSE).
+
+This project is licensed under the [MIT License](LICENSE) - open and free for educational and commercial development.
