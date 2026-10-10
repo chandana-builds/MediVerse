@@ -70,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .summary-banner {
-            background: rgba(15, 23, 42, 0.7);
+            background: #f8fafc;
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-md);
             padding: 20px;
@@ -87,13 +87,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .summary-row strong {
-            color: #fff;
+            color: #0f172a;
         }
 
         .total-price {
             font-size: 24px;
             font-weight: 800;
-            color: #34d399;
+            color: #059669;
             font-family: var(--font-heading);
         }
     </style>

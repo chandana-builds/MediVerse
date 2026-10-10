@@ -38,16 +38,17 @@ $ord_count = $orders ? $orders->num_rows : 0;
             flex-wrap: wrap;
             gap: 20px;
             margin-bottom: 30px;
-            background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(99, 102, 241, 0.1));
-            border: 1px solid rgba(56, 189, 248, 0.25);
+            background: linear-gradient(135deg, #e0f2fe 0%, #ecfdf5 100%);
+            border: 1px solid #bae6fd;
             border-radius: var(--radius-xl);
             padding: 30px 35px;
-            backdrop-filter: blur(16px);
+            box-shadow: var(--shadow-card);
         }
 
         .welcome-text h1 {
             font-size: 32px;
             margin-bottom: 6px;
+            color: #0f172a;
         }
 
         .welcome-text p {
@@ -56,16 +57,17 @@ $ord_count = $orders ? $orders->num_rows : 0;
         }
 
         .dash-date-badge {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid var(--border-subtle);
+            background: #ffffff;
+            border: 1px solid #bae6fd;
             padding: 10px 18px;
             border-radius: var(--radius-full);
             font-size: 13px;
-            font-weight: 600;
-            color: var(--primary-light);
+            font-weight: 700;
+            color: #0284c7;
             display: flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
         }
 
         /* KPI Quick Counters */
@@ -77,21 +79,21 @@ $ord_count = $orders ? $orders->num_rows : 0;
         }
 
         .kpi-card {
-            background: var(--bg-card);
+            background: #ffffff;
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
             padding: 22px;
-            backdrop-filter: blur(14px);
             display: flex;
             align-items: center;
             gap: 18px;
+            box-shadow: var(--shadow-card);
             transition: var(--transition);
         }
 
         .kpi-card:hover {
             transform: translateY(-3px);
-            border-color: rgba(56, 189, 248, 0.4);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            border-color: #93c5fd;
+            box-shadow: var(--shadow-card-hover);
         }
 
         .kpi-icon {
@@ -105,24 +107,24 @@ $ord_count = $orders ? $orders->num_rows : 0;
         }
 
         .kpi-info .kpi-num {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 800;
             font-family: var(--font-heading);
-            color: #fff;
+            color: #0f172a;
             line-height: 1.1;
         }
 
         .kpi-info .kpi-title {
             color: var(--text-muted);
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             margin-top: 2px;
         }
 
         /* Emergency Action Banner */
         .emergency-banner {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(185, 28, 28, 0.28));
-            border: 1px solid rgba(239, 68, 68, 0.45);
+            background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+            border: 1.5px solid #fca5a5;
             border-radius: var(--radius-lg);
             padding: 24px 30px;
             display: flex;
@@ -131,7 +133,7 @@ $ord_count = $orders ? $orders->num_rows : 0;
             flex-wrap: wrap;
             gap: 20px;
             margin-bottom: 35px;
-            box-shadow: 0 10px 30px -5px rgba(239, 68, 68, 0.25);
+            box-shadow: 0 4px 18px rgba(220, 38, 38, 0.08);
         }
 
         .emergency-text {
@@ -139,7 +141,7 @@ $ord_count = $orders ? $orders->num_rows : 0;
         }
 
         .emergency-text h3 {
-            color: #fca5a5;
+            color: #b91c1c;
             font-size: 20px;
             margin-bottom: 4px;
             display: flex;
@@ -148,7 +150,7 @@ $ord_count = $orders ? $orders->num_rows : 0;
         }
 
         .emergency-text p {
-            color: #e2e8f0;
+            color: #7f1d1d;
             font-size: 14px;
         }
 
@@ -161,14 +163,14 @@ $ord_count = $orders ? $orders->num_rows : 0;
         }
 
         .hub-item {
-            background: var(--bg-card);
+            background: #ffffff;
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-md);
             padding: 20px 15px;
             text-align: center;
             text-decoration: none;
-            color: #fff;
-            backdrop-filter: blur(14px);
+            color: var(--text-main);
+            box-shadow: var(--shadow-card);
             transition: var(--transition);
             display: flex;
             flex-direction: column;
@@ -178,25 +180,26 @@ $ord_count = $orders ? $orders->num_rows : 0;
 
         .hub-item:hover {
             transform: translateY(-4px);
-            background: var(--bg-card-hover);
-            border-color: rgba(56, 189, 248, 0.5);
-            box-shadow: 0 12px 25px -5px rgba(14, 165, 233, 0.25);
+            background: #ffffff;
+            border-color: #93c5fd;
+            box-shadow: var(--shadow-card-hover);
         }
 
         .hub-icon {
-            font-size: 32px;
-            width: 50px;
-            height: 50px;
+            font-size: 30px;
+            width: 52px;
+            height: 52px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            background: #f0fdfa;
         }
 
         .hub-title {
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
+            color: #0f172a;
         }
 
         /* Data Section Panels */

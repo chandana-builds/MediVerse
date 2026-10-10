@@ -41,11 +41,11 @@ $result = $conn->query("SELECT * FROM medicines ORDER BY name ASC");
         }
 
         .med-card {
-            background: var(--bg-card);
+            background: #ffffff;
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
             padding: 24px;
-            backdrop-filter: blur(14px);
+            box-shadow: var(--shadow-card);
             transition: var(--transition);
             display: flex;
             flex-direction: column;
@@ -53,10 +53,9 @@ $result = $conn->query("SELECT * FROM medicines ORDER BY name ASC");
         }
 
         .med-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(56, 189, 248, 0.4);
-            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
-            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+            border-color: #93c5fd;
+            box-shadow: var(--shadow-card-hover);
         }
 
         .med-badge-row {
@@ -69,7 +68,7 @@ $result = $conn->query("SELECT * FROM medicines ORDER BY name ASC");
         .med-title {
             font-size: 19px;
             margin-bottom: 6px;
-            color: #fff;
+            color: #0f172a;
         }
 
         .med-store {
@@ -87,14 +86,14 @@ $result = $conn->query("SELECT * FROM medicines ORDER BY name ASC");
             align-items: center;
             justify-content: space-between;
             padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 1px solid var(--border-subtle);
         }
 
         .med-price {
             font-family: var(--font-heading);
             font-size: 24px;
             font-weight: 800;
-            color: #34d399;
+            color: #059669;
         }
     </style>
     <script>

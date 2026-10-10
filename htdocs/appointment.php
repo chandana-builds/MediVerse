@@ -71,20 +71,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         .slot-pill {
             padding: 12px 10px;
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid var(--border-subtle);
+            background: #f8fafc;
+            border: 1.5px solid var(--border-subtle);
             border-radius: var(--radius-md);
             text-align: center;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: var(--transition);
-            color: var(--text-main);
+            color: #334155;
         }
 
         .slot-pill:hover {
-            border-color: var(--primary-light);
-            background: rgba(14, 165, 233, 0.15);
+            border-color: var(--primary);
+            background: #e0f2fe;
+            color: var(--primary);
             transform: translateY(-2px);
         }
 

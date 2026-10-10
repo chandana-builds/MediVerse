@@ -61,19 +61,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .auth-card {
             width: 100%;
             max-width: 440px;
-            background: var(--bg-card);
+            background: #ffffff;
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-xl);
             padding: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
             text-align: center;
             position: relative;
         }
 
         .auth-tabs {
             display: flex;
-            background: rgba(15, 23, 42, 0.7);
+            background: #f1f5f9;
             border-radius: var(--radius-full);
             padding: 4px;
             margin-bottom: 28px;
@@ -92,15 +91,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .auth-tab.active {
-            background: var(--primary);
-            color: #fff;
-            box-shadow: 0 2px 10px rgba(14, 165, 233, 0.4);
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+            font-weight: 700;
         }
 
         .alert-error {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.35);
-            color: #fca5a5;
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
             padding: 12px;
             border-radius: var(--radius-md);
             font-size: 13px;

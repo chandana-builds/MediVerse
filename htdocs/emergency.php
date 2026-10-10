@@ -45,19 +45,19 @@ $family = $conn->query("SELECT * FROM family_members WHERE user_id=$user_id");
         }
 
         .sos-header-card {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.3));
-            border: 2px solid rgba(239, 68, 68, 0.5);
+            background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+            border: 2px solid #fca5a5;
             border-radius: var(--radius-xl);
             padding: 35px 25px;
             margin-bottom: 25px;
-            box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 20px rgba(220, 38, 38, 0.12);
             animation: pulse-sos 2.5s infinite;
         }
 
         .eta-tracker {
-            background: rgba(16, 185, 129, 0.18);
-            border: 1px solid rgba(16, 185, 129, 0.45);
-            color: #6ee7b7;
+            background: #ecfdf5;
+            border: 1.5px solid #a7f3d0;
+            color: #047857;
             padding: 16px;
             border-radius: var(--radius-lg);
             font-size: 16px;
@@ -78,10 +78,11 @@ $family = $conn->query("SELECT * FROM family_members WHERE user_id=$user_id");
         }
 
         .unit-cell {
-            background: rgba(15, 23, 42, 0.65);
+            background: #ffffff;
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-md);
             padding: 14px;
+            box-shadow: var(--shadow-card);
         }
 
         .unit-cell small {
@@ -91,10 +92,11 @@ $family = $conn->query("SELECT * FROM family_members WHERE user_id=$user_id");
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 4px;
+            font-weight: 700;
         }
 
         .unit-cell strong {
-            color: #fff;
+            color: #0f172a;
             font-size: 14px;
         }
     </style>
@@ -109,7 +111,7 @@ $family = $conn->query("SELECT * FROM family_members WHERE user_id=$user_id");
             <div class="brand-logo-icon">🩺</div>
             <div class="brand-name">
                 MediVerse
-                <span class="brand-badge" style="background: rgba(239,68,68,0.2); color: #f87171; border-color: rgba(239,68,68,0.4);">SOS ACTIVE</span>
+                <span class="brand-badge" style="background: #fee2e2; color: #b91c1c; border-color: #fecaca;">SOS ACTIVE</span>
             </div>
         </a>
         <nav class="nav-menu">
@@ -124,8 +126,8 @@ $family = $conn->query("SELECT * FROM family_members WHERE user_id=$user_id");
             <!-- SOS DISPATCH STATUS -->
             <div class="sos-header-card">
                 <div style="font-size: 48px; margin-bottom: 10px;">🚑</div>
-                <h1 style="font-size: 28px; color: #fff; margin-bottom: 8px;">Emergency Unit Dispatched</h1>
-                <p style="color: #fca5a5; font-size: 15px;">Your GPS telemetry and medical profile have been transmitted to the paramedic dispatch center.</p>
+                <h1 style="font-size: 28px; color: #991b1b; margin-bottom: 8px;">Emergency Unit Dispatched</h1>
+                <p style="color: #7f1d1d; font-size: 15px;">Your GPS telemetry and medical profile have been transmitted to the paramedic dispatch center.</p>
 
                 <div class="eta-tracker">
                     <span>📍 Live Telemetry: Ambulance unit is ~4-6 minutes away</span>
@@ -159,7 +161,7 @@ $family = $conn->query("SELECT * FROM family_members WHERE user_id=$user_id");
                 <?php if ($family && $family->num_rows > 0): ?>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <?php while($f = $family->fetch_assoc()): ?>
-                            <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-subtle); padding: 12px 18px; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+                            <div style="background: #f8fafc; border: 1px solid var(--border-subtle); padding: 12px 18px; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
                                 <div>
                                     <strong><?php echo htmlspecialchars($f['name']); ?></strong>
                                     <span style="color: var(--text-dim); font-size: 12px; margin-left: 6px;">(<?php echo htmlspecialchars($f['relation']); ?>)</span>

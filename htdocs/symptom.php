@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .symptom-chip {
-            background: rgba(15, 23, 42, 0.7);
+            background: #f1f5f9;
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-full);
             padding: 6px 14px;
@@ -93,31 +93,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: var(--text-muted);
             cursor: pointer;
             transition: var(--transition);
+            font-weight: 600;
         }
 
         .symptom-chip:hover {
-            border-color: var(--primary-light);
-            color: #fff;
-            background: rgba(14, 165, 233, 0.15);
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #e0f2fe;
         }
 
         .triage-result-card {
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(56, 189, 248, 0.35);
+            background: #f8fafc;
+            border: 1.5px solid #bae6fd;
             border-radius: var(--radius-lg);
             padding: 26px;
             margin-top: 30px;
+            box-shadow: var(--shadow-card);
             animation: fadeIn 0.4s ease;
         }
 
         .triage-alert {
-            background: rgba(239, 68, 68, 0.18);
-            border: 1px solid rgba(239, 68, 68, 0.45);
-            color: #fca5a5;
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
             padding: 14px;
             border-radius: var(--radius-md);
             margin-top: 15px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 14px;
         }
     </style>

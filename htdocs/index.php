@@ -32,13 +32,13 @@ if (isset($_SESSION['user_id'])) {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 16px;
-            background: rgba(14, 165, 233, 0.12);
-            border: 1px solid rgba(14, 165, 233, 0.35);
+            padding: 6px 18px;
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
             border-radius: var(--radius-full);
-            color: var(--primary-light);
+            color: #0369a1;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 24px;
             animation: fadeInDown 0.8s ease;
         }
@@ -49,6 +49,7 @@ if (isset($_SESSION['user_id'])) {
             margin-bottom: 22px;
             font-weight: 800;
             letter-spacing: -0.03em;
+            color: #0f172a;
         }
 
         .hero p {
@@ -78,33 +79,32 @@ if (isset($_SESSION['user_id'])) {
         }
 
         .stat-card {
-            background: rgba(15, 23, 42, 0.65);
+            background: #ffffff;
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
-            padding: 24px;
+            padding: 26px 20px;
             text-align: center;
-            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-card);
             transition: var(--transition);
         }
 
         .stat-card:hover {
             transform: translateY(-4px);
-            border-color: rgba(56, 189, 248, 0.4);
-            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.2);
+            border-color: #93c5fd;
+            box-shadow: var(--shadow-card-hover);
         }
 
         .stat-number {
             font-family: var(--font-heading);
-            font-size: 36px;
+            font-size: 38px;
             font-weight: 800;
-            color: #fff;
             margin-bottom: 4px;
         }
 
         .stat-label {
             color: var(--text-muted);
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -118,6 +118,7 @@ if (isset($_SESSION['user_id'])) {
         .section-header h2 {
             font-size: 36px;
             margin-bottom: 12px;
+            color: #0f172a;
         }
 
         .section-header p {
@@ -135,7 +136,7 @@ if (isset($_SESSION['user_id'])) {
         }
 
         .service-card {
-            background: var(--bg-card);
+            background: #ffffff;
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-lg);
             padding: 32px;
@@ -143,32 +144,32 @@ if (isset($_SESSION['user_id'])) {
             display: flex;
             flex-direction: column;
             position: relative;
-            backdrop-filter: blur(14px);
+            box-shadow: var(--shadow-card);
         }
 
         .service-card:hover {
-            transform: translateY(-6px);
-            background: var(--bg-card-hover);
-            border-color: rgba(56, 189, 248, 0.35);
-            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.6);
+            transform: translateY(-5px);
+            border-color: #93c5fd;
+            box-shadow: var(--shadow-card-hover);
         }
 
         .service-icon {
-            width: 54px;
-            height: 54px;
-            border-radius: 14px;
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 26px;
             margin-bottom: 20px;
-            background: rgba(14, 165, 233, 0.12);
-            border: 1px solid rgba(14, 165, 233, 0.25);
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
         }
 
         .service-card h3 {
             font-size: 20px;
             margin-bottom: 12px;
+            color: #0f172a;
         }
 
         .service-card p {
@@ -180,9 +181,9 @@ if (isset($_SESSION['user_id'])) {
         }
 
         .service-link {
-            color: var(--primary-light);
+            color: var(--primary);
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -191,25 +192,26 @@ if (isset($_SESSION['user_id'])) {
         }
 
         .service-link:hover {
-            color: #fff;
+            color: #0369a1;
             gap: 10px;
         }
 
         /* Banner CTA */
         .cta-banner {
-            background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(99, 102, 241, 0.2));
-            border: 1px solid rgba(56, 189, 248, 0.35);
+            background: linear-gradient(135deg, #e0f2fe 0%, #ecfdf5 100%);
+            border: 1px solid #bae6fd;
             border-radius: var(--radius-xl);
             padding: 50px 40px;
             text-align: center;
             margin-bottom: 70px;
             position: relative;
-            backdrop-filter: blur(16px);
+            box-shadow: var(--shadow-card);
         }
 
         .cta-banner h2 {
             font-size: 34px;
             margin-bottom: 14px;
+            color: #0f172a;
         }
 
         .cta-banner p {
